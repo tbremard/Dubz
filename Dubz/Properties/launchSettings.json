@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dubz": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Prog\\Schleupen\\DubzLib.Tests\\bin\\Debug\\net8.0"
+    }
+  }
+}
