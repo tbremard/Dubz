@@ -91,5 +91,32 @@ namespace DubzLib.Tests
             Assert.IsNotNull(kandidaten, "SammleKandidaten should not return null");
             Assert.AreEqual(4, kandidaten.Count, "Should find exactly 4 groups of files with same name and size");
         }
+
+        [Test]
+        public void PruefeKandidaten_WhenContentIdentical_ThenGrouped()
+        {
+            var dubletten = new Dubletten();
+
+            // Create test group with duplicate.txt files (identical content)
+            var duplicateFiles = new List<string>
+            {
+                "TargetFakeDir\\A\\duplicate.txt",
+                "TargetFakeDir\\B\\duplicate.txt", 
+                "TargetFakeDir\\duplicate.txt"
+            };
+            var testGroup = new DubletteImpl(duplicateFiles);
+            var kandidaten = new List<IDublette> { testGroup };
+
+            // Verify content with MD5 hash comparison
+            var verifiedDuplicates = dubletten.PruefeKandidaten(kandidaten);
+
+            Console.WriteLine($"Input: 1 group with {testGroup.Dateipfade.Count} files");
+            Console.WriteLine($"Output: {verifiedDuplicates?.Count ?? 0} verified groups");
+
+            // Should return 1 group since all duplicate.txt files have identical content
+            Assert.IsNotNull(verifiedDuplicates, "PruefeKandidaten should not return null");
+            Assert.AreEqual(1, verifiedDuplicates.Count, "Should return 1 verified group");
+            Assert.AreEqual(3, verifiedDuplicates.First().Dateipfade.Count, "Group should contain 3 files");
+        }
     }
 }

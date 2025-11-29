@@ -1,6 +1,6 @@
 namespace DubzLib
 {
-    internal class DubletteImpl : IDublette
+    public class DubletteImpl : IDublette
     {
         private readonly IReadOnlyCollection<string> _dateipfade;
 
