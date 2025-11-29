@@ -27,20 +27,23 @@ namespace DubzLib
 
         public List<Item> BuildItems(string pfad, Vergleichsmodi modus)
         {
+            if (!Directory.Exists(pfad))
+            {
+                throw new DirectoryNotFoundException(pfad);
+
+            }
             var directories = Directory.GetDirectories(pfad);
             var ret = new List<Item>();
             foreach (var subDir in directories)
             {
-                string curPath = Path.Combine(pfad, subDir);
-                var curItems = BuildItems(curPath, modus);
+                var curItems = BuildItems(subDir, modus);
                 ret.AddRange(curItems);
             }   
             var files = Directory.GetFiles(pfad);
-            foreach (var file in files)
+            foreach (var filePath in files)
             {
-                string currentKey = CreateKey(file, modus);
-                string curPath = Path.Combine(pfad, file);
-                var item = new Item(currentKey, curPath);
+                string currentKey = CreateKey(filePath, modus);
+                var item = new Item(currentKey, filePath);
                 ret.Add(item);
             }
             return ret;
@@ -54,9 +57,9 @@ namespace DubzLib
             {
                 ret +=  fileInfo.Length.ToString();
             }
-            else // GroesseUndName
+            else
             {
-                ret += $"{fileInfo.Length}_{Path.GetFileName(filePath)}";
+                ret += $"{fileInfo.Length}::{fileInfo.Name}";
             }
             return ret;
         }

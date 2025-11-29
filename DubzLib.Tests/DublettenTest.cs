@@ -10,11 +10,12 @@ namespace DubzLib.Tests
         [Test]
         public void BuildItems()
         {
-            string currentDirectory = Directory.GetCurrentDirectory();
-            Console.WriteLine($"Current Directory: {currentDirectory}");
+//            string targetDir = Directory.GetCurrentDirectory();
+            string targetDir = "TargetFakeDir";
+            Console.WriteLine($"Target Directory: {targetDir}");
             var dubletten = new Dubletten();
 
-            var items = dubletten.BuildItems(currentDirectory, Vergleichsmodi.GroesseUndName);
+            var items = dubletten.BuildItems(targetDir, Vergleichsmodi.GroesseUndName);
 
             foreach (var item in items)
             {
