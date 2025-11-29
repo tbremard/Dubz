@@ -10,13 +10,13 @@ namespace Dubz
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: Dubz FilePath");
-                Console.WriteLine("      search for similar file recursively from current directory");
+                Console.WriteLine("Usage: Dubz <Directory>");
+                Console.WriteLine("      search for similar file recursively in <Directory>");
                 Console.WriteLine("      display all matching files");
                 return;
             }
             string currentDirectory = Directory.GetCurrentDirectory();
-            var dubletten = new Dubletten(currentDirectory);
+            var dubletten = new Dubletten();
         }
     }
 }
