@@ -24,10 +24,12 @@ namespace Dubz
                 return;
             }
             var dubletten = new Dubletten();
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             Console.WriteLine("[+] Grouping by size all files...");
             var kandidaten = dubletten.SammleKandidaten(targetDir, Vergleichsmodi.Groesse);
             Console.WriteLine("[+] Calculate hashes for exact matching...");
             var found = dubletten.PruefeKandidaten(kandidaten);
+            stopwatch.Stop();
             if (found.Count==0)
             {
                 Console.WriteLine("No duplicate files found.");
@@ -38,10 +40,11 @@ namespace Dubz
                 Console.WriteLine("------------------");
                 foreach (var pfad in dublette.Dateipfade)
                 {
-                    Console.WriteLine($"  - {pfad}");
+                    Console.WriteLine($"{pfad}");
                 }
             }
-            Console.WriteLine($"Found {found.Count} duplicate group of files");
+            Console.WriteLine("------------------");
+            Console.WriteLine($"Found {found.Count} duplicate group of files in: "+(int)stopwatch.Elapsed.TotalSeconds+" sec");
         }
     }
 }
