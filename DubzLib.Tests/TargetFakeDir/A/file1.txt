@@ -1,0 +1,1 @@
+This is file1 in directory A. Same name as root but different content. About 100 bytes total here.

@@ -1,0 +1,1 @@
+This is file1 in the root directory. It contains exactly 100 bytes of text content for testing.

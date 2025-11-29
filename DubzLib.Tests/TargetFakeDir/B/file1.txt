@@ -1,0 +1,1 @@
+This is file1 in directory B. Fourth instance of file1 name but with different content. About 100 bytes.

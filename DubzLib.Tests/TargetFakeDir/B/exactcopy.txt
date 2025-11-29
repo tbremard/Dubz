@@ -1,0 +1,1 @@
+This is an exact copy test file with identical name and content in multiple places for verification.

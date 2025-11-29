@@ -1,0 +1,1 @@
+This is a duplicate file. It has the same name and content in multiple locations for testing duplicates.

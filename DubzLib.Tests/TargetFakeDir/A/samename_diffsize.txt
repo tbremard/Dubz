@@ -1,0 +1,1 @@
+Same name as B/samename_diffsize.txt but much shorter content. Different size.

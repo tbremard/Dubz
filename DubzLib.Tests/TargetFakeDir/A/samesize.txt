@@ -1,0 +1,1 @@
+This file has the same size as another but different name and content. Testing size-only comparison mode.

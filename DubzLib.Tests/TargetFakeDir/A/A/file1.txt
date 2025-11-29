@@ -1,0 +1,1 @@
+This is file1 in directory A/A. Same name appears in 3 places with different content. About 100 bytes.
