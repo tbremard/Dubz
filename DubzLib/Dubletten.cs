@@ -21,8 +21,25 @@ namespace DubzLib
 
         public IReadOnlyCollection<IDublette> SammleKandidaten(string pfad, Vergleichsmodi modus)
         {
-            List<Item> ret = BuildItems(pfad, modus);
-            return null;
+            List<Item> items = BuildItems(pfad, modus);            
+            var groups = new Dictionary<string, List<string>>();
+            foreach (var item in items)
+            {
+                if (!groups.ContainsKey(item.Key))
+                {
+                    groups[item.Key] = new List<string>();
+                }
+                groups[item.Key].Add(item.Path);
+            }
+            var ret = new List<IDublette>();
+            foreach (var group in groups.Values)
+            {
+                if (group.Count > 1)
+                {
+                    ret.Add(new DubletteImpl(group));
+                }
+            }
+            return ret;
         }
 
         public List<Item> BuildItems(string pfad, Vergleichsmodi modus)

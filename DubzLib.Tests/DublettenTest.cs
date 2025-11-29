@@ -26,7 +26,7 @@ namespace DubzLib.Tests
         }
 
         [Test]
-        public void SammleKandidaten_Groesse()
+        public void SammleKandidaten_WenGroupByGroesse_ThenGrouped()
         {
             string targetDir = "TargetFakeDir";
             Console.WriteLine($"Target Directory: {targetDir}");
