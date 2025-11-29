@@ -6,10 +6,10 @@ namespace DubzLib
     {
         public IReadOnlyCollection<IDublette> PruefeKandidaten(IEnumerable<IDublette> kandidaten)
         {
-            Console.WriteLine($"FastFilter with {kandidaten.Count()} groups...");
+            Console.WriteLine($"[+] FastFilter on {kandidaten.Count()} groups...");
             var fastHasher = new FastHasher();
-            List<IDublette> fastFiltered = ParallelFilter(kandidaten, fastHasher); // this is Expert French touch
-            Console.WriteLine($"Md5Filter with {fastFiltered.Count()} groups...");
+            List<IDublette> fastFiltered = ParallelFilter(kandidaten, fastHasher); // this is Expert French touch (not in spec, but 90% of reliability in 10% of time)
+            Console.WriteLine($"[+] Md5Filter on {fastFiltered.Count()} groups...");
             var md5Hasher = new Md5Hasher();
             List<IDublette> ret = ParallelFilter(fastFiltered, md5Hasher);
             return ret;
@@ -18,14 +18,16 @@ namespace DubzLib
         private List<IDublette> ParallelFilter(IEnumerable<IDublette> kandidaten, IHasher hasher)
         {
             var ret = new List<IDublette>();
-            
             foreach (var kandidat in kandidaten)
             {
                 var hashedBag = new ConcurrentBag<FileHashed>();                
                 Parallel.ForEach(kandidat.Dateipfade, filePath =>
                 {
                     string hash = hasher.Hash(filePath);
-                    hashedBag.Add(new FileHashed(filePath, hash));
+                    if (hash != null)
+                    {
+                        hashedBag.Add(new FileHashed(filePath, hash));
+                    }
                 });                
                 var hashGroups = new Dictionary<string, List<string>>();
                 foreach (var item in hashedBag)
@@ -55,7 +57,9 @@ namespace DubzLib
 
         public IReadOnlyCollection<IDublette> SammleKandidaten(string pfad, Vergleichsmodi modus)
         {
-            List<Item> items = BuildItems(pfad, modus);            
+            Console.WriteLine($"[+] Enumerate all files recursively...");
+            List<Item> items = BuildItems(pfad, modus);
+            Console.WriteLine($"    ... found {items.Count} files");
             var groups = new Dictionary<string, List<string>>();
             foreach (var item in items)
             {
@@ -83,7 +87,15 @@ namespace DubzLib
                 throw new DirectoryNotFoundException(pfad);
 
             }
-            var directories = Directory.GetDirectories(pfad);
+            string[] directories;
+            try
+            {
+                directories = Directory.GetDirectories(pfad);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return new List<Item>();
+            }
             var ret = new List<Item>();
             foreach (var subDir in directories)
             {

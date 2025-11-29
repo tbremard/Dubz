@@ -25,9 +25,7 @@ namespace Dubz
             }
             var dubletten = new Dubletten();
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            Console.WriteLine("[+] Grouping by size all files...");
             var kandidaten = dubletten.SammleKandidaten(targetDir, Vergleichsmodi.Groesse);
-            Console.WriteLine("[+] Calculate hashes for exact matching...");
             var found = dubletten.PruefeKandidaten(kandidaten);
             stopwatch.Stop();
             if (found.Count==0)
