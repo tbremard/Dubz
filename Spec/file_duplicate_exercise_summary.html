@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Duplicate Detection - Programming Exercise Summary</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { color: #333; border-bottom: 2px solid #333; }
+        h2 { color: #555; margin-top: 30px; }
+        h3 { color: #666; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        code { background-color: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+        ul { margin-left: 20px; }
+        ol { margin-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>File Duplicate Detection - Programming Exercise Summary</h1>
+
+    <h2>Overview</h2>
+    <p>This is a programming exercise to develop a library for finding file duplicates in a directory tree using C# .NET Core 8.</p>
+
+    <h2>Required Interface Structure</h2>
+
+    <h3>IDublette Interface</h3>
+    <pre><code>public interface IDublette {
+    IReadOnlyCollection&lt;string&gt; Dateipfade { get; }  // File paths
+}</code></pre>
+
+    <h3>Comparison Modes Enum</h3>
+    <pre><code>public enum Vergleichsmodi {
+    GroesseUndName,  // Size and Name
+    Groesse          // Size only
+}</code></pre>
+
+    <h3>Main Interface - IDublettenpruefung</h3>
+    <pre><code>public interface IDublettenpruefung {
+    IReadOnlyCollection&lt;IDublette&gt; SammleKandidaten(string pfad);
+    IReadOnlyCollection&lt;IDublette&gt; SammleKandidaten(string pfad, Vergleichsmodi modus);
+    IReadOnlyCollection&lt;IDublette&gt; PruefeKandidaten(IEnumerable&lt;IDublette&gt; kandidaten);
+}</code></pre>
+
+    <h2>Method Descriptions</h2>
+
+    <h3>SammleKandidaten(string pfad)</h3>
+    <ul>
+        <li>Searches all files under the specified path</li>
+        <li>Checks for equality based on <strong>size AND name</strong></li>
+        <li>Returns potential duplicates</li>
+    </ul>
+
+    <h3>SammleKandidaten(string pfad, Vergleichsmodi modus)</h3>
+    <ul>
+        <li>Searches all files under the specified path</li>
+        <li>Checks for equality based on the specified comparison mode:
+            <ul>
+                <li><code>GroesseUndName</code>: Compare by size AND name</li>
+                <li><code>Groesse</code>: Compare by size only</li>
+            </ul>
+        </li>
+        <li>Returns potential duplicates</li>
+    </ul>
+
+    <h3>PruefeKandidaten(IEnumerable&lt;IDublette&gt; kandidaten)</h3>
+    <ul>
+        <li><strong>Purpose</strong>: Verifies if duplicate candidates are actually identical files</li>
+        <li><strong>Input</strong>: Collection of potential duplicates (kandidaten = candidates)</li>
+        <li><strong>Process</strong>: Compares file content using MD5 hash</li>
+        <li><strong>Output</strong>: Only the files that are truly identical (same content)</li>
+        <li><strong>Note</strong>: This is the verification step - it takes the "maybe duplicates" from the previous methods and confirms which ones are real duplicates by comparing their actual content</li>
+    </ul>
+
+    <h2>Requirements</h2>
+    <ol>
+        <li><strong>Language</strong>: C# .NET Core 8</li>
+        <li><strong>Code Quality</strong>: Focus on readability and maintainability</li>
+        <li><strong>Testing</strong>: Unit tests required</li>
+        <li><strong>Demo</strong>: Command line application to demonstrate the API</li>
+        <li><strong>External Libraries</strong>: Allowed (especially for MD5 hashing)</li>
+        <li><strong>Pattern</strong>: Use "return ret" pattern for all return variables</li>
+    </ol>
+
+    <h2>Implementation Notes</h2>
+    <ul>
+        <li>The MD5 hash function doesn't need to be implemented from scratch</li>
+        <li>Existing code from the internet can be used for hashing</li>
+        <li>The exercise is part of a firm selection process</li>
+        <li>Solution should be sent in advance for review</li>
+    </ul>
+
+    <h2>Two-Step Process Explanation</h2>
+    <ol>
+        <li><strong>Step 1</strong> (<code>SammleKandidaten</code>): Quick screening based on file metadata (name/size)</li>
+        <li><strong>Step 2</strong> (<code>PruefeKandidaten</code>): Thorough verification using content comparison (MD5)</li>
+    </ol>
+
+    <p>This approach is efficient because checking file metadata is much faster than computing hashes, so you first narrow down the candidates before doing the expensive hash comparisons.</p>
+
+</body>
+</html>
