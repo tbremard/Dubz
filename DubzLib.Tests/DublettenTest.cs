@@ -24,5 +24,39 @@ namespace DubzLib.Tests
 
             Assert.Greater(items.Count, 10);
         }
+
+        [Test]
+        public void SammleKandidaten_Groesse()
+        {
+            string targetDir = "TargetFakeDir";
+            Console.WriteLine($"Target Directory: {targetDir}");
+            var dubletten = new Dubletten();
+
+            var kandidaten = dubletten.SammleKandidaten(targetDir, Vergleichsmodi.Groesse);
+
+            Console.WriteLine($"Found {kandidaten?.Count ?? 0} duplicate groups");
+            
+            if (kandidaten != null)
+            {
+                foreach (var dublette in kandidaten)
+                {
+                    Console.WriteLine($"Duplicate group with {dublette.Dateipfade.Count} files:");
+                    foreach (var pfad in dublette.Dateipfade)
+                    {
+                        Console.WriteLine($"  - {pfad}");
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            // Based on TargetFakeDir content, we should find exactly 5 duplicate groups by size:
+            // 33 bytes: small.txt (2 files)
+            // 100 bytes: exactcopy.txt x2, file2.txt, unique.txt (4 files) 
+            // 103 bytes: different_name.txt, identical_content.txt (2 files)
+            // 104 bytes: duplicate.txt x3, B/file1.txt (4 files)
+            // 105 bytes: samesize.txt x2 (2 files)
+            Assert.IsNotNull(kandidaten, "SammleKandidaten should not return null");
+            Assert.AreEqual(5, kandidaten.Count, "Should find exactly 5 groups of files with same size");
+        }
     }
 }
