@@ -1,85 +1,41 @@
-﻿
-using System.Reflection;
-using System.IO;
-using System.Security.Principal;
-using System.Security.Cryptography;
+﻿using System.Collections.Concurrent;
 
 namespace DubzLib
 {
-
     public class Dubletten: IDublettenpruefung
     {
         public IReadOnlyCollection<IDublette> PruefeKandidaten(IEnumerable<IDublette> kandidaten)
         {
             Console.WriteLine($"FastFilter with {kandidaten.Count()} groups...");
-            List<IDublette> fastFiltered = FastFilter(kandidaten); // this is Expert French touch
+            var fastHasher = new FastHasher();
+            List<IDublette> fastFiltered = ParallelFilter(kandidaten, fastHasher); // this is Expert French touch
             Console.WriteLine($"Md5Filter with {fastFiltered.Count()} groups...");
-            List<IDublette> ret = Md5Filter(fastFiltered);
+            var md5Hasher = new Md5Hasher();
+            List<IDublette> ret = ParallelFilter(fastFiltered, md5Hasher);
             return ret;
         }
 
-        private List<IDublette> FastFilter(IEnumerable<IDublette> kandidaten)
+        private List<IDublette> ParallelFilter(IEnumerable<IDublette> kandidaten, IHasher hasher)
         {
             var ret = new List<IDublette>();
-            foreach (var kandidat in kandidaten)
-            {
-                var hashGroups = new Dictionary<string, List<string>>();
-                foreach (var filePath in kandidat.Dateipfade)
-                {
-                    string hash = ComputeFastHash(filePath);
-                    if (!hashGroups.ContainsKey(hash))
-                    {
-                        hashGroups[hash] = new List<string>();
-                    }
-                    hashGroups[hash].Add(filePath);
-                }
-                foreach (var group in hashGroups.Values)
-                {
-                    if (group.Count > 1)
-                    {
-                        ret.Add(new DubletteImpl(group));
-                    }
-                }
-            }
             
-            return ret;
-        }
-
-        private string ComputeFastHash(string filePath)
-        {
-            const int FAST_HASH_SIZE = 10000;
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filePath))
-                {
-                    var buffer = new byte[FAST_HASH_SIZE];
-                    int bytesRead = stream.Read(buffer, 0, FAST_HASH_SIZE);                    
-                    if (bytesRead < FAST_HASH_SIZE)
-                    {
-                        Array.Resize(ref buffer, bytesRead);
-                    }
-                    byte[] hash = md5.ComputeHash(buffer);
-                    return Convert.ToHexString(hash);
-                }
-            }
-        }
-
-        private List<IDublette> Md5Filter(IEnumerable<IDublette> kandidaten)
-        {
-            var ret = new List<IDublette>();
             foreach (var kandidat in kandidaten)
             {
-                var hashGroups = new Dictionary<string, List<string>>();
-                foreach (var filePath in kandidat.Dateipfade)
+                var hashedBag = new ConcurrentBag<FileHashed>();                
+                Parallel.ForEach(kandidat.Dateipfade, filePath =>
                 {
-                    string hash = ComputeMd5Hash(filePath);
-                    if (!hashGroups.ContainsKey(hash))
+                    string hash = hasher.Hash(filePath);
+                    hashedBag.Add(new FileHashed(filePath, hash));
+                });                
+                var hashGroups = new Dictionary<string, List<string>>();
+                foreach (var item in hashedBag)
+                {
+                    if (!hashGroups.ContainsKey(item.Hash))
                     {
-                        hashGroups[hash] = new List<string>();
+                        hashGroups[item.Hash] = new List<string>();
                     }
-                    hashGroups[hash].Add(filePath);
+                    hashGroups[item.Hash].Add(item.FilePath);
                 }
-
                 foreach (var group in hashGroups.Values)
                 {
                     if (group.Count > 1)
@@ -88,20 +44,7 @@ namespace DubzLib
                     }
                 }
             }
-
             return ret;
-        }
-
-        private string ComputeMd5Hash(string filePath)
-        {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filePath))
-                {
-                    byte[] hash = md5.ComputeHash(stream);
-                    return Convert.ToHexString(hash);
-                }
-            }
         }
 
         public IReadOnlyCollection<IDublette> SammleKandidaten(string pfad)
