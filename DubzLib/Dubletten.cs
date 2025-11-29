@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.IO;
 using System.Security.Principal;
+using System.Security.Cryptography;
 
 namespace DubzLib
 {
@@ -10,7 +11,45 @@ namespace DubzLib
     {
         public IReadOnlyCollection<IDublette> PruefeKandidaten(IEnumerable<IDublette> kandidaten)
         {
-            throw new NotImplementedException();
+            var ret = new List<IDublette>();
+            
+            foreach (var kandidat in kandidaten)
+            {
+                var hashGroups = new Dictionary<string, List<string>>();
+                
+                foreach (var filePath in kandidat.Dateipfade)
+                {
+                    string hash = ComputeMd5Hash(filePath);
+                    
+                    if (!hashGroups.ContainsKey(hash))
+                    {
+                        hashGroups[hash] = new List<string>();
+                    }
+                    hashGroups[hash].Add(filePath);
+                }
+                
+                foreach (var group in hashGroups.Values)
+                {
+                    if (group.Count > 1)
+                    {
+                        ret.Add(new DubletteImpl(group));
+                    }
+                }
+            }
+            
+            return ret;
+        }
+        
+        private string ComputeMd5Hash(string filePath)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filePath))
+                {
+                    byte[] hash = md5.ComputeHash(stream);
+                    return Convert.ToHexString(hash);
+                }
+            }
         }
 
         public IReadOnlyCollection<IDublette> SammleKandidaten(string pfad)
