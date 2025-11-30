@@ -1,8 +1,8 @@
 ﻿using DubzLib;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using static System.Net.WebRequestMethods;
 
 namespace Dubz
 {
@@ -24,25 +24,40 @@ namespace Dubz
                 return;
             }
             var dubletten = new Dubletten();
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            Print("Searching for duplicates in directory:");
+            Print(targetDir);
+            var stopwatch = Stopwatch.StartNew();
             var kandidaten = dubletten.SammleKandidaten(targetDir, Vergleichsmodi.Groesse);
             var found = dubletten.PruefeKandidaten(kandidaten);
             stopwatch.Stop();
-            if (found.Count==0)
+            int durationSec = (int)stopwatch.Elapsed.TotalSeconds;
+            SaveResults(found, durationSec);
+        }
+
+        private static void SaveResults(IReadOnlyCollection<IDublette> found, int durationSec)
+        {
+            if (found.Count == 0)
             {
-                Console.WriteLine("No duplicate files found.");
+                Print("No duplicate files found.");
                 return;
             }
             foreach (var dublette in found)
             {
-                Console.WriteLine("------------------");
+                Print("------------------");
                 foreach (var pfad in dublette.Dateipfade)
                 {
-                    Console.WriteLine($"{pfad}");
+                    Print($"{pfad}");
                 }
             }
-            Console.WriteLine("------------------");
-            Console.WriteLine($"Found {found.Count} duplicate group of files in: "+(int)stopwatch.Elapsed.TotalSeconds+" sec");
+            Print("------------------");
+            Print($"Found {found.Count} groups of files duplicates in: " + durationSec + " sec");
+            return;
+        }
+
+        private static void Print(string v)
+        {
+            Console.WriteLine(v);
+            File.AppendAllText("result.txt", v + Environment.NewLine);
         }
     }
 }

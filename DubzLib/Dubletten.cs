@@ -8,8 +8,8 @@ namespace DubzLib
         {
             Console.WriteLine($"[+] FastFilter on {kandidaten.Count()} groups...");
             var fastHasher = new FastHasher();
-            List<IDublette> fastFiltered = ParallelFilter(kandidaten, fastHasher); // this is Expert French touch (not in spec, but 90% of reliability in 10% of time)
-            Console.WriteLine($"[+] Md5Filter on {fastFiltered.Count()} groups...");
+            List<IDublette> fastFiltered = ParallelFilter(kandidaten, fastHasher); // (not in spec, but 90% of reliability in 10% of time)
+            Console.WriteLine($"[+] Md5Filter  on {fastFiltered.Count()} groups...");
             var md5Hasher = new Md5Hasher();
             List<IDublette> ret = ParallelFilter(fastFiltered, md5Hasher);
             return ret;
